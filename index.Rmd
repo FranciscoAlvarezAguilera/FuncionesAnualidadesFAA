@@ -1,0 +1,370 @@
+---
+title: "**PROBLEMAS Y FUNCIONES DE ANUALIDADES**"
+author: "Francisco Alvarez Aguilera - Mat.Financieras - LACD "
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 5
+    toc_float:
+        collapsed: false
+        srooth_scroll: true 
+    
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+![](actuariaLOGO.png){width="20%"}
+
+## **INTRODUCCIÓN**
+
+En el presente trabajo se lleva a cabo la resolución de los problemas propuestos sobre anualidades tal como se ha indicado en la "Tarea proyecto integrador 1". Los primeros 2 problemas se solucionarán aplicando las dos modalidades de las anualidades (vencidas y anticipadas), mientras que el 3er problema está reservado específicamente para utilizar las funciones que atienden a la modalidad de anualidades diferidas.
+
+Para la solución de estos problemas utilizaremos las respectivas funciones que creamos con anterioridad, para obtenerlas utilizaremos el comando "source("")" ingresando a esta la liga de nuestro compendio de funciones:
+
+```{r}
+source("funcionesAnualidades.R")
+```
+
+
+## **PROBLEMA 1**
+
+**Problema 1 para valores futuros:**  Una persona desea ahorrar $500.00 cada fin de quincena durante 40 años. Si el fondo de inversión paga una tasa de rendimiento de 7.5% ¿Cuánto dinero tendrá ahorrado al final de su proyecto financiero?
+
+### Problema 1 - Anualidades Vencidas
+
+Identificamos los datos con los que contamos:
+
+Tasa anual: $7.5\%$
+
+**Tasa del periodo:** $7.5\%  \div 24 = 0.003125 = 0.3125\%$
+
+**Número de periodos:** $40 años \times 24quincenas$ $=$ $960 periodos$
+
+**Anualidad:**  $\$500$
+
+Cómo nos piden el monto final del proyecto financiero utilizaremos nuestra función que calcula el **Valor Final**, en este caso, en modalidad de anualidades vencidas, utilizamos la función **VFVenc**
+
+```{r problema1VFVenc}
+# Definimos nuestros datos anteriores en variables para ingresarlos a nuestra función:
+
+tasa = 0.003125
+numeroPeriodos = 960
+anualidad = 500
+
+# Ingresamos las variables a la función y almacenamos el resultado:
+
+VFV = VFVenc(tasa, numeroPeriodos, anualidad)
+```
+
+```{r resultadoVFVenc,echo=FALSE}
+paste0("El monto final ahorrado por la persona despues de 40 años es: $", VFV)
+```
+### Problema 1 - Anualidades Anticipadas
+
+Para esta modalidad utilizaremos de nuevo nuestros datos almacenados en las variables creadas para el caso anterior con la diferencia de que en este caso utilizaremos la función correspondiente a Anualidades Anticipadas la cuañ es: **VFAnt**
+
+```{r}
+# Utilizamos la función "VFAnt" y almacenamos el resultado:
+
+VFA = VFAnt(tasa, numeroPeriodos, anualidad)
+```
+
+```{r resultadoVFAnt,echo=FALSE}
+paste0("El monto final ahorrado por la persona despues de 40 años con la modalidad de anualidades anticipadas es: $", VFA)
+
+paste("Como podemos observar, la modalidad de anualidades anticipadas es mas beneficosa en estos casos.")
+```
+## **PROBLEMA 2**
+
+**Problema 2 para valores actuales:** Una persona paga cada quincena $450.00 durante 2 años. Si la tienda departamental le cobra de 11% de interés ¿Cuánto le prestaron?
+
+### Problema 2 - Anualidades Vencidas
+
+Identificamos los datos con los que contamos:
+
+Tasa anual: 11%
+
+**Tasa del periodo:** $11 \% \div 24 = 0.004583333 = 0.4583333\%$
+
+**Número de periodos:** $2 años \times 24 quincenas = 48 periodos$
+
+**Anualidad:** $\$450$
+
+Al pedirnos el monto del prestamo se trata de un problema de obtener el Valor Actual o Inicial, para este caso utilizaremos la función **VAVenc**que es la correspondiente a anualidades vencidas.
+```{r problema2VAVenc}
+# Definimos nuestros datos anteriores en variables para ingresarlos a nuestra función:
+
+tasa = 0.11/24
+numeroPeriodos = 48
+anualidad = 450
+
+# Ingresamos las variables a la función y almacenamos el resultado:
+
+VAV = VAVenc(tasa, numeroPeriodos, anualidad)
+```
+
+```{r resultadoVAVenc, echo=FALSE}
+paste0("El monto el prestamo que pidió la persona fue de: $", VAV)
+```
+### Problema 2-Anualidades Anticipades 
+
+De igual manera y utilizando las mismas variables creadas obtenemos el Valor Actual pero en este caso utilizando la función correspondiente a esta modalidad de anualidades: **VAAnt**
+
+```{r problema2VAAnt}
+# Ingresamos las variables a la función y almacenamos el resultado:
+
+VAA = VAAnt(tasa, numeroPeriodos, anualidad)
+```
+
+```{r resultadoVAAnt, echo=FALSE}
+paste0("El monto el prestamo que pidió la persona fue de: $", VAA)
+```
+Al comparar los dos valores actuales obtenidos en cada modalidad de anualidad, nos damos cuenta que en el Valor Actual Anticipado el monto del prestamo fue mayor, por lo que para prestamos esta modalidad es mas beneficiosa, pues se obtiene un monto mayor con la misma cantidad de pagos y monto de estos.
+
+
+## **PROBLEMA 3**
+
+**Problema 3 (solo para anualidades diferidas) Del problema anterior:** ¿Cuánto le prestaron si comienza a pagar 3 meses después de adquirido el financiamiento?
+
+Para este problema de anualidades diferidas necesitamos calcular dos valores actuales, el primer VA a calcular sera el que calculamos en el problema 2 con anualidades vencidas, este mismo VA ahora lo consideraremos como un Valor Final, mediante este y con los otros datos definidos podemos calcular el Valor Actual "original" que corresponde al prestamo original otorgado a la persona. Para la solución utilizaremos nuestra función **VADif**.
+
+```{r Problema3}
+# Definimos las variables de los datos del problema 2:
+
+tasa = 0.11/24
+numeroPeriodos = 48
+anualidad = 450
+
+# Agregamos el dato adicional al número de periodos del periodo de Gracia:
+# Consideramos 6 periodos pues capitaliza quincenalmente por 3 meses
+
+nperDif = 6
+
+# Almacenamos y corremos la función:
+
+VAD = VADif(tasa, numeroPeriodos, anualidad, nperDif)
+```
+```{r printProblema3, echo=FALSE}
+
+paste0("El monto original del prestamo otorgado y considerando el periodo de gracia fue de : $",VAD)
+
+```
+## **COMPROBACIÓN DE LAS FUNCIONES RESTANTES**
+
+Ademas de las funciones anteriormente utilizadas (VFVenc, VFAnt, VAVenc, VAAnt y VADif) vamos a comprobar el correcto funcionamiento de las 13 funciones restantes, esto utilizando los mismos datos de cada problema para su respectivo problema, observando que los datos coincidan con el resultado devuelto por la función.
+
+### Funciones Problema 1 - Anualidades Vencidas
+
+Despues de solucionar el problema 1 recopilamos los siguientes datos:
+
+**Tasa del periodo:** $0.3125\%$
+
+**Número de periodos:** $960 periodos$
+
+**Anualidad:**  $\$500$
+
+**ValorFinal:** $\$3,038,688.1705314$
+
+Comprobamos el correcto de funcionamiento de cada función:
+
+```{r Comprobación1}
+# Definimos las variables:
+
+tasa = 0.003125
+nper = 960
+pago = 500
+VF = 3038688.1705314
+
+# Primero almacenamos para tasa con la función tasaVFVenc:
+
+tasaVFV = tasaVFVenc(nper, pago, VF)
+
+# Para el numero de periodos (960) utilizamos periodosVFVenc:
+
+nperVFV = periodosVFVenc(tasa, pago, VF)
+
+# Para la anualidad la función correspondiente es pagoVFVenc
+
+pagoVFV = pagoVFVenc(tasa, nper, VF)
+
+```
+
+```{r printComprobación1, echo=FALSE}
+paste0("La tasa es: ",tasaVFV)
+paste0("El número de periodos es: ", nperVFV)
+paste0("La anualidad es: ",pagoVFV )
+
+```
+Como podemos observar los valores retornados por las funciones corresponden a los definidos en el problema 1 aunque con una mínima diferencia en la parte decimal.
+
+
+### Funciones Problema 1 - Anualidades Anticipadas
+
+Despues de solucionar el problema 1 recopilamos los siguientes datos con un valor final diferente al de anu. vencidas:
+
+**Tasa del periodo:** $0.3125\%$
+
+**Número de periodos:** $960 periodos$
+
+**Anualidad:**  $\$500$
+
+**ValorFinal:** $\$3,048,184.07106431$
+
+Comprobamos el correcto de funcionamiento de cada función:
+
+```{r Comprobación2}
+# Definimos las variables:
+
+tasa = 0.003125
+nper = 960
+pago = 500
+VF = 3048184.07106431
+
+# Primero almacenamos para tasa con la función tasaVFAnt:
+
+tasaVFA = tasaVFAnt(nper, pago, VF)
+
+# Para el numero de periodos (960) utilizamos periodosVFVenc:
+
+nperVFA = periodosVFAnt(tasa, pago, VF)
+
+# Para la anualidad la función correspondiente es pagoVFVenc
+
+pagoVFA = pagoVFAnt(tasa, nper, VF)
+
+```
+
+```{r printComprobación2, echo=FALSE}
+paste0("La tasa es: ",tasaVFA)
+paste0("El número de periodos es: ", nperVFA)
+paste0("La anualidad es: ",pagoVFA )
+
+```
+Como podemos observar la funciones regresan los valores correctos.
+
+### Funciones Problema 2 - Anualidades Vencidas
+
+Despues de solucionar el problema 2 recopilamos los siguientes datos:
+
+**Tasa del periodo:** $0.4583333\%$
+
+**Número de periodos:** $48 \hspace{0.2cm} periodos$
+
+**Anualidad:** $\$450$
+
+**Valor Actual:** $\$19,349.4498028172$
+
+Comprobamos el correcto de funcionamiento de cada función:
+
+```{r Comprobación3}
+# Definimos las variables:
+
+tasa = 0.004583333
+nper = 48
+pago = 450
+VA = 19349.4498028172
+
+# Primero almacenamos para la tasa con la función tasaVAVenc:
+
+tasaVAV = tasaVAVenc(nper, pago, VA)
+
+# Para el numero de periodos (48) utilizamos periodosVAVenc:
+
+nperVAV = periodosVAVenc(tasa, pago, VA)
+
+# Para la anualidad la función correspondiente es pagoVAVenc
+
+pagoVAV = pagoVAVenc(tasa, nper, VA)
+
+```
+
+```{r printComprobación3, echo=FALSE}
+paste0("La tasa es: ",tasaVAV)
+paste0("El número de periodos es: ", nperVAV)
+paste0("La anualidad es: ",pagoVAV )
+
+```
+Para este caso la diferencia de los valores de las funciones con los datos es minimamente mayor, essto debido a que para las funciones de VA se utilizó un ubral menor esto para disminuir el tiempo de procesamiento.
+
+### Funciones Problema 2 - Anualidades Anticipadas
+
+
+Despues de solucionar el problema 2 recopilamos los siguientes datos:
+
+**Tasa del periodo:** $0.4583333\%$
+
+**Número de periodos:** $48 \hspace{0.2cm} periodos$
+
+**Anualidad:** $\$450$
+
+**Valor Actual:** $\$19,438.1347810801$
+
+Comprobamos el correcto de funcionamiento de cada función:
+
+```{r Comprobación4}
+# Definimos las variables:
+
+tasa = 0.004583333
+nper = 48
+pago = 450
+VA = 19438.1347810801
+
+# Primero almacenamos para la tasa con la función tasaVAAnt:
+
+tasaVAA = tasaVAAnt(nper, pago, VA)
+
+# Para el numero de periodos (48) utilizamos periodosVAAnt:
+
+nperVAA = periodosVAAnt(tasa, pago, VA)
+
+# Para la anualidad la función correspondiente es pagoVAAnt
+
+pagoVAA = pagoVAAnt(tasa, nper, VA)
+
+```
+
+```{r printComprobación4, echo=FALSE}
+paste0("La tasa es: ",tasaVAA)
+paste0("El número de periodos es: ", nperVAA)
+paste0("La anualidad es: ",pagoVAA )
+
+```
+### Funciones Problema 3 - Anualidades Diferidas
+
+Para el tema de anualidades diferidas en el prblema 3 solo falta por revisar la ultima función, esta funcion es la de **pagoVADif**, que calcula la anualidad correspondiente a el periodo siguiente al periodo de gracia. 
+
+Para revisar esta función necesitamos recopilar datos del problema 2 con anualidades vencidas y el nper del periodo de gracia. Los datos son los siguientes:
+
+**Tasa del periodo:** $0.11/24$
+
+**Número de periodos:** $48$
+
+**Número de periodos de diferimiento:** $6$ 
+
+**Valor Actual:** $\$18825.7726004772$
+
+**Anualidad:** $\$450$
+
+Comprobamos el correcto de funcionamiento de la función:
+
+```{r comprobación5}
+# Definimos las variables dadas por los datos:
+
+tasa = 0.11/24
+nper = 48
+nperDif = 6 
+VA = 18825.7726004772
+
+# Almacenamos y corremos la función pagoVADif:
+
+pagoVAD = pagoVADif(tasa, nper, nperDif, VA)
+
+```
+
+```{r printComprobación5, echo=FALSE}
+paste0("La anualidad en el problema de anualidades diferidas es de : $", pagoVAD)
+```
+La función trabaja correctamente.
+
